@@ -22,7 +22,8 @@ INIT_LR = 1e-3
 BS =64
 default_image_size = tuple((50,50))
 
-directory_root = 'PlantVillage/PlantVillage'
+directory_root = '/home/prabhat/PycharmProjects/mlpackage01/PlantVillage/PlantVillage'
+
 width=50
 height=50
 depth=3
@@ -65,7 +66,7 @@ try:
             if single_plant_disease_image == ".DS_Store":
                 plant_disease_image_list.remove(single_plant_disease_image)
         #print("directory_root/plant_folder/plant_disease_image_list",directory_root,plant_folder,plant_disease_image_list)
-        for image in plant_disease_image_list[:200]:
+        for image in plant_disease_image_list[:300]:
             image_directory=f"{directory_root}/{plant_folder}/{image}"
             imageData=imageData+1
             if image_directory.endswith(".jpg")==True or image_directory.endswith(".JPG")==True:
@@ -84,9 +85,9 @@ try:
 
     pickle.dump(label_binarizer,open('label_transform.pkl','wb'))
     n_classes=len(label_binarizer.classes_)
-    x_train, x_test, y_train, y_test = train_test_split(np_image_list, image_labels, test_size=0.3, random_state=42)
+    x_train, x_test, y_train, y_test = train_test_split(np_image_list, image_labels, test_size=0.25, random_state=42)
     z=zip(x_test,y_test);
-    pickle.dump(z,open('zipData.pkl','wb'));
+    pickle.dump(z,open('zipData2.pkl','wb'));
 
     #print("number of classes-->",n_class)
     #print("label-->",image_labels)
@@ -148,7 +149,7 @@ try:
     model.add(Dense(256))
     model.add(Activation("relu"))
     model.add(BatchNormalization())
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.75))
 
     model.add(Dense(n_classes))
     model.add(Activation("softmax"))
@@ -166,6 +167,27 @@ try:
         epochs=EPOCHS, verbose=1
     )
 
+    acc = history.history['acc']
+    val_acc = history.history['val_acc']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+
+    epochs = range(1, len(acc) + 1)
+
+    plt.plot(epochs, acc, 'r-', label='Training acc')
+    plt.plot(epochs, val_acc, 'b-', label='Validation acc')
+    plt.title('Training and validation accuracy')
+    plt.legend()
+
+    plt.figure()
+
+    plt.plot(epochs, loss, 'r-', label='Training loss')
+    plt.plot(epochs, val_loss, 'b-', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.legend()
+    
+    plt.show();
+    
     pickle.dump(model, open('cnn_model.pkl', 'wb'))
     print("saved successfully")
     print("[INFO] Calculating model accuracy")
